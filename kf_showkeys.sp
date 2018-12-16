@@ -19,9 +19,18 @@ char C[2][4] = {FW_SPC, FW_C};
 char J[2][4] = {FW_SPC, FW_J};
 char angSignL[3][4] = {FW_LARROW, FW_SPC, FW_SPC};
 char angSignR[3][4] = {FW_SPC, FW_SPC, FW_RARROW};
+bool g_showkeys[MAXPLAYERS+1];
 int K(int a, int b){ if(a&b) return 1; return 0; }
 
 public void OnPluginStart(){
+	RegConsoleCmd("sm_showkeys", Cmd_ShowKeys);
+}
+public Action Cmd_ShowKeys(int client, int argc){
+  if(client){
+    g_showkeys[client] ^= true;
+    ReplyToCommand(client, "[KF] showkeys %s", g_showkeys[client]?"on":"off");
+  }
+  return Plugin_Handled;
 }
 public Action OnPlayerRunCmd(int client, int& buttons, int& impulse, float vel[3], float angles[3], int& weapon, int& subtype, int& cmdnum, int& tickcount, int& seed, int mouse[2]){
 	static float _prevyaw[MAXPLAYERS+1];
@@ -37,7 +46,8 @@ public Action OnPlayerRunCmd(int client, int& buttons, int& impulse, float vel[3
 	int dangsign = dang>0.0?0:dang<0.0?2:1;
 	if(buttons!=prevbuttons||dangsign!=prevdangsign){
 		SetHudTextParams(-1.0, 0.6, 1.0, 0x66, 0xCC, 0xFF, 0xFF, 0, 0.0, 0.0, 0.0);
-		ShowHudText(client, 2, "%s\n"...
+    if(g_showkeys[client])
+		  ShowHudText(client, 2, "%s\n"...
 													 "%s%s%s%s%s\n"...
 													   "%s%s%s",
 													 W[K(buttons,IN_FORWARD)],
